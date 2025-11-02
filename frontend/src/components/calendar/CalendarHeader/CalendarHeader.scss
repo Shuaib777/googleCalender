@@ -1,0 +1,145 @@
+.calendar-header {
+  display: flex;
+  max-width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  padding: 0.7rem 1.6rem; // slightly more spacing
+  font-size: 1rem; // base font control
+  color: var(--text-primary);
+
+  .icon {
+    font-size: 2.1rem; // bigger icons
+    margin: 0 0.2rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0.4rem;
+
+    &:hover {
+      background: var(--bg-hover);
+      border-radius: 50%;
+    }
+  }
+
+  .icon.hamburger-icon:hover {
+    border-radius: 0;
+  }
+
+  .left-section {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem; // slightly more gap
+
+    .logo {
+      display: flex;
+      align-items: center;
+
+      img {
+        height: 2rem; // slightly larger
+        margin-right: 0.4rem;
+      }
+
+      .title {
+        font-size: 1.4rem;
+        font-weight: 400;
+      }
+    }
+
+    .today-btn {
+      background: transparent;
+      border: 1px solid var(--border-dark);
+      border-radius: 2rem;
+      padding: 0.4rem 1rem; // more padding
+      font-size: 1rem;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--bg-hover);
+      }
+    }
+
+    .nav-arrows {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+
+      .arrow {
+        font-size: 1.5rem; // larger arrows
+        cursor: pointer;
+        padding: 0 0.4rem;
+        color: var(--text-primary);
+
+        &:hover {
+          background: var(--bg-hover);
+          border-radius: 50%;
+        }
+      }
+    }
+
+    .date {
+      font-size: 1.25rem; // slightly larger text
+      margin-left: 0.6rem;
+    }
+  }
+
+  .right-section {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+
+    .view-selector select {
+      text-decoration: none;
+      outline: none;
+      border: 1px solid var(--border-dark);
+      border-radius: 2rem;
+      padding: 0.45rem 1.4rem; // more balanced padding
+      background: transparent;
+      font-size: 1rem;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--bg-hover);
+      }
+    }
+
+    .view-buttons {
+      display: flex;
+      border: 1px solid var(--border-dark);
+      border-radius: 2rem;
+      overflow: hidden;
+
+      button {
+        border: none;
+        background: none;
+        padding: 0.5rem 1.2rem; // bigger click area
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+
+        &.active {
+          background: var(--bg-hover);
+        }
+
+        &:hover {
+          background: var(--bg-hover);
+        }
+      }
+    }
+
+    .profile {
+      background: #d93025;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 50%;
+      width: 2.4rem;
+      height: 2.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+  }
+}
