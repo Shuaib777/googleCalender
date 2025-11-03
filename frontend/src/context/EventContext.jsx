@@ -1,9 +1,11 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import useApi from "../hooks/useApi";
+import { useAuth } from "./AuthContext";
 
 const EventContext = createContext();
 
 export const EventProvider = ({ children }) => {
+  const { user } = useAuth();
   const request = useApi();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -17,12 +19,14 @@ export const EventProvider = ({ children }) => {
     request(`/events/${id}`, "DELETE", null, false, true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getEvents();
-      if (data) setEvents(data);
-    };
-    fetchData();
-  }, []);
+    if (user) {
+      const fetchData = async () => {
+        const data = await getEvents();
+        if (data) setEvents(data);
+      };
+      fetchData();
+    }
+  }, [user]);
 
   const addEvent = async (newEvent) => {
     const saved = await addEventApi(newEvent);
@@ -31,6 +35,7 @@ export const EventProvider = ({ children }) => {
 
   const updateEvent = async (updatedEvent) => {
     const saved = await updateEventApi(updatedEvent);
+    console.log(saved, updateEvent);
     if (saved)
       setEvents((prev) =>
         prev.map((ev) => (ev._id === saved._id ? saved : ev))

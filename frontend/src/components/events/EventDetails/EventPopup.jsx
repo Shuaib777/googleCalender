@@ -15,7 +15,7 @@ import { useEvent } from "../../../context/EventContext";
 
 const EventPopup = ({ event, onClose }) => {
   const [showEventCard, setShowEventCard] = useState(false);
-  const { deleteEvent, updateEvent } = useEvent();
+  const { deleteEvent } = useEvent();
 
   const handleEditClick = () => {
     setShowEventCard(true);
@@ -37,12 +37,6 @@ const EventPopup = ({ event, onClose }) => {
   };
 
   const handleEventCardClose = () => {
-    setShowEventCard(false);
-    onClose();
-  };
-
-  const handleSave = async (updatedData) => {
-    await updateEvent(updatedData);
     setShowEventCard(false);
     onClose();
   };
@@ -150,7 +144,6 @@ const EventPopup = ({ event, onClose }) => {
           isOpen={showEventCard}
           onClose={handleEventCardClose}
           initialData={formatEventData(event)}
-          onSave={handleSave}
         />
       )}
     </>

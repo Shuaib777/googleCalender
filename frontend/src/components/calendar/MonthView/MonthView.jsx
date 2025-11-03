@@ -50,7 +50,6 @@ const MonthView = () => {
       });
     }
 
-    // Fill next month days to complete the grid (42 cells typical)
     const totalCells = 42;
     const nextDays = totalCells - days.length;
     for (let i = 1; i <= nextDays; i++) {
@@ -66,14 +65,12 @@ const MonthView = () => {
     return days;
   };
 
-  // whenever events or selectedDate change, rebuild grid
   useEffect(() => {
     if (selectedDate) {
       setGridData(buildMonthGrid(selectedDate, events));
     }
   }, [events, selectedDate]);
 
-  // Dynamic row heights
   useEffect(() => {
     if (containerRef.current && gridData.length > 0) {
       const containerHeight = containerRef.current.clientHeight;

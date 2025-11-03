@@ -18,7 +18,7 @@ const EventCard = ({ isOpen, onClose, initialData }) => {
   const { addEvent, updateEvent, selectedDate, setSelectedDate } = useEvent();
 
   const [formData, setFormData] = useState({
-    id: initialData?._id || null,
+    id: initialData?.id || null,
     title: initialData?.title || "",
     date: initialData?.date || "",
     startTime: initialData?.startTime || "",
@@ -32,7 +32,7 @@ const EventCard = ({ isOpen, onClose, initialData }) => {
   useEffect(() => {
     if (isOpen) {
       setFormData({
-        id: initialData?._id || null,
+        id: initialData?.id || null,
         title: initialData?.title || "",
         date: initialData?.date || selectedDate.toISOString().split("T")[0],
         startTime: initialData?.startTime || "",
