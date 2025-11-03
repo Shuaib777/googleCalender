@@ -1,4 +1,4 @@
-## Google Calendar
+<img width="1918" height="931" alt="image" src="https://github.com/user-attachments/assets/cdc54c5e-f441-493a-80cf-c5d04193d85a" />## Google Calendar
 
 # hosted Link - google-calender-rho.vercel.app
 
@@ -161,6 +161,12 @@ Backend (Node + Express):
 --> Maintains user-specific event data through JWT authentication.
 
 --> Handles invalid input gracefully with validation checks.
+
+# Project Images
+<img width="1918" height="931" alt="image" src="https://github.com/user-attachments/assets/ac18ac5f-273f-4fe8-8e4b-1a311c4c021f" />
+<img width="1919" height="932" alt="image" src="https://github.com/user-attachments/assets/7d7884eb-2a86-4053-a9b1-3dc30001255a" />
+<img width="1919" height="932" alt="image" src="https://github.com/user-attachments/assets/beb8fd4b-f3a6-49dc-ad38-89ac683403ab" />
+
 
 # Animations & Transitions
 
