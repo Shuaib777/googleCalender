@@ -1,6 +1,5 @@
 import Event from "../models/eventModel.js";
 import { toISTMidnight } from "../utils/dateUtils.js";
-// import { expandRecurringEvents } from "../utils/recurrence.js"; // optional, for future use
 
 export const createEvent = async (req, res) => {
   try {
@@ -134,7 +133,17 @@ export const getMonthEvents = async (req, res) => {
       const dayEvents = events.filter((ev) => {
         const start = new Date(ev.startTime);
         const end = new Date(ev.endTime);
-        return currentDate >= start && currentDate <= end;
+
+        const toISTDateString = (d) =>
+          new Date(d.getTime() + 5.5 * 60 * 60 * 1000)
+            .toISOString()
+            .split("T")[0];
+
+        const currentDateStr = toISTDateString(currentDate);
+        const startStr = toISTDateString(start);
+        const endStr = toISTDateString(end);
+
+        return currentDateStr >= startStr && currentDateStr <= endStr;
       });
 
       grid.push({

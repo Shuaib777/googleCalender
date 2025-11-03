@@ -11,82 +11,89 @@ import {
 import { SiGooglemeet } from "react-icons/si";
 import "./EventCard.scss";
 import { useAuth } from "../../../context/AuthContext";
+import useApi from "../../../hooks/useApi";
 
-// Helper to format default date & time
-const getInitialFormData = (initialData = {}) => {
-  const now = new Date();
-
-  const year = now.getFullYear();
-  const month = (now.getMonth() + 1).toString().padStart(2, "0");
-  const day = now.getDate().toString().padStart(2, "0");
-  const defaultDate = `${year}-${month}-${day}`;
-
-  const startHour = now.getHours().toString().padStart(2, "0");
-  const startMinute = now.getMinutes().toString().padStart(2, "0");
-  const defaultStart = `${startHour}:${startMinute}`;
-
-  const end = new Date(now.getTime() + 60 * 60 * 1000);
-  const endHour = end.getHours().toString().padStart(2, "0");
-  const endMinute = end.getMinutes().toString().padStart(2, "0");
-  const defaultEnd = `${endHour}:${endMinute}`;
-
-  return {
-    title: initialData.title || "",
-    date: initialData.date || defaultDate,
-    startTime: initialData.startTime || defaultStart,
-    endTime: initialData.endTime || defaultEnd,
-    description: initialData.description || "",
-  };
-};
-
-const EventCard = ({ isOpen, onClose, onSave, initialData = {} }) => {
+const EventCard = ({ isOpen, onClose, initialData }) => {
   const { user } = useAuth();
-  const [formData, setFormData] = useState(getInitialFormData(initialData));
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState(null);
+  const request = useApi();
 
-  // 💡 When modal opens or new initialData comes in, only reset *once*
+  const [formData, setFormData] = useState({
+    id: initialData?.id || null,
+    title: initialData?.title || "",
+    date: initialData?.date || "",
+    startTime: initialData?.startTime || "",
+    endTime: initialData?.endTime || "",
+    description: initialData?.description || "",
+  });
+
+  const [error, setError] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+
   useEffect(() => {
     if (isOpen) {
-      setFormData(getInitialFormData(initialData));
+      setFormData({
+        id: initialData?.id || null,
+        title: initialData?.title || "",
+        date: initialData?.date || "",
+        startTime: initialData?.startTime || "",
+        endTime: initialData?.endTime || "",
+        description: initialData?.description || "",
+      });
       setError(null);
     }
   }, [isOpen, initialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async () => {
-    setIsSaving(true);
     setError(null);
+    setIsSaving(true);
+
+    if (!formData.title) {
+      setError("Title is required");
+      setIsSaving(false);
+      return;
+    }
 
     try {
-      const response = await fetch("/api/events", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          user: user?._id,
-        }),
-      });
+      const { id, date, startTime, endTime, title, description } = formData;
 
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.message || "Failed to save event.");
+      const startDateTime =
+        date && startTime ? new Date(`${date}T${startTime}:00`) : null;
+      const endDateTime =
+        date && endTime ? new Date(`${date}T${endTime}:00`) : null;
+
+      const payload = {
+        title,
+        description,
+        startTime: startDateTime ? startDateTime.toISOString() : null,
+        endTime: endDateTime ? endDateTime.toISOString() : null,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      };
+
+      let data;
+
+      if (id) {
+        // ✏️ Edit existing event
+        console.log("Updating event:", id, payload);
+        data = await request(`/events/${id}`, "PUT", payload, false, true);
+      } else {
+        // 🆕 Create new event
+        console.log("Creating event:", payload);
+        data = await request("/events", "POST", payload, false, true);
       }
 
-      const newEvent = await response.json();
-      onSave?.(newEvent);
+      if (data) {
+        console.log("Event saved successfully:", data);
+      }
+
       onClose();
     } catch (err) {
-      setError(err.message);
+      console.error(err);
+      setError(err.message || "Something went wrong");
     } finally {
       setIsSaving(false);
     }
@@ -128,7 +135,7 @@ const EventCard = ({ isOpen, onClose, onSave, initialData = {} }) => {
 
         {/* Details */}
         <div className="event-details">
-          {/* Date and Time */}
+          {/* Time Row */}
           <div className="detail-row">
             <MdAccessTime size={24} className="detail-icon" />
             <div className="detail-content">
@@ -160,11 +167,13 @@ const EventCard = ({ isOpen, onClose, onSave, initialData = {} }) => {
             </div>
           </div>
 
+          {/* Guests */}
           <div className="detail-row">
             <MdPeople size={24} className="detail-icon" />
             <span className="detail-text">Add guests</span>
           </div>
 
+          {/* Google Meet */}
           <div className="detail-row google-meet-row">
             <SiGooglemeet size={24} className="detail-icon google-meet-icon" />
             <span className="detail-text">
@@ -172,11 +181,13 @@ const EventCard = ({ isOpen, onClose, onSave, initialData = {} }) => {
             </span>
           </div>
 
+          {/* Location */}
           <div className="detail-row">
             <MdLocationOn size={24} className="detail-icon" />
             <span className="detail-text">Add location</span>
           </div>
 
+          {/* Description */}
           <div className="detail-row">
             <MdDescription size={24} className="detail-icon" />
             <textarea
@@ -189,6 +200,7 @@ const EventCard = ({ isOpen, onClose, onSave, initialData = {} }) => {
             />
           </div>
 
+          {/* Calendar Info */}
           <div className="detail-row">
             <MdCalendarToday size={24} className="detail-icon" />
             <div className="detail-content">
@@ -214,7 +226,7 @@ const EventCard = ({ isOpen, onClose, onSave, initialData = {} }) => {
             onClick={handleSubmit}
             disabled={isSaving}
           >
-            {isSaving ? "Saving..." : "Save"}
+            {isSaving ? "Saving..." : formData.id ? "Update" : "Save"}
           </button>
         </div>
       </div>

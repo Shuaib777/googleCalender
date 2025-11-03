@@ -13,7 +13,6 @@
   gap: 5px;
   align-items: center;
 
-  /* Weekday Name (only top row cells) */
   .weekday-name {
     font-size: 0.7rem;
     font-weight: 600;
@@ -23,16 +22,12 @@
   }
 
   &.other-month {
-    // background-color: var(--bg-secondary);
-    // opacity: 0.5;
-
     .date-number {
       color: var(--calendar-other-month);
     }
   }
 }
 
-// Date Number
 .date-number {
   display: flex;
   align-items: center;
@@ -59,35 +54,32 @@
   }
 }
 
-// Events Container
 .events-container {
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
   flex: 1;
   overflow: hidden;
+  width: 100%;
 }
 
-// Individual Event Item
 .event-item {
   display: flex;
   align-items: center;
-  padding: 0.125rem 0.25rem;
-  background-color: var(--event-blue-bg);
-  border-radius: 0.125rem;
   font-size: 0.6875rem;
   line-height: 1.2;
-  color: var(--text-primary);
-  // transition: all 0.15s ease;
+  padding: 5px 5px;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   min-height: 1.125rem;
+  background-color: var(--event-blue);
+  border-radius: 4px;
+  color: var(--bg-primary);
 
   &:hover {
     filter: brightness(0.95);
-    //   transform: translateX(0.125rem);
   }
 
   .event-time {
@@ -103,7 +95,6 @@
   }
 }
 
-// More events indicator
 .more-events {
   font-size: 0.6875rem;
   color: var(--text-secondary);
@@ -112,13 +103,10 @@
   transition: color 0.2s ease;
 
   &:hover {
-    //   color: var(--primary-blue);
     background-color: var(--bg-hover);
-    //   text-decoration: underline;
   }
 }
 
-// Responsive adjustments
 @media (max-width: 48rem) {
   .calendar-grid-cell {
     min-height: 5rem;
@@ -137,7 +125,6 @@
   }
 }
 
-// Dark mode specific adjustments
 [data-theme="dark"] {
   .event-item {
     &:hover {

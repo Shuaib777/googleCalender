@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   FaBars,
   FaSearch,
@@ -9,17 +9,34 @@ import {
   FaTh,
 } from "react-icons/fa";
 import "./CalendarHeader.scss";
+import { useAuth } from "../../../context/AuthContext";
+import { MdOutlineArrowDropDown } from "react-icons/md";
 
 const CalendarHeader = ({
   onToggleSidebar,
   currentCalendarView,
   setCurrentCalendarView,
 }) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const currentMonthYear = new Date().toLocaleString("default", {
+    month: "long",
+    year: "numeric",
+  });
+
+  const options = [
+    { label: "Day", value: "day", shortcut: "D" },
+    { label: "Week", value: "week", shortcut: "W" },
+    { label: "Month", value: "month", shortcut: "M" },
+    { label: "Year", value: "year", shortcut: "Y" },
+  ];
+
+  const { user } = useAuth();
+
   return (
     <header className="calendar-header">
       <div className="left-section">
         <FaBars onClick={onToggleSidebar} className="icon hamburger-icon" />
-
         <div className="logo">
           <img
             src="https://www.gstatic.com/images/branding/product/1x/calendar_2020q4_48dp.png"
@@ -27,51 +44,72 @@ const CalendarHeader = ({
           />
           <span className="title">Calendar</span>
         </div>
-
-        {/* Today Button */}
         <button className="today-btn">Today</button>
-
-        {/* Navigation Arrows */}
         <div className="nav-arrows">
           <span className="arrow">‹</span>
           <span className="arrow">›</span>
         </div>
-
-        {/* Current Date */}
-        <span className="date">November 2025</span>
+        <span className="date">{currentMonthYear}</span>
       </div>
 
-      {/* === RIGHT SECTION === */}
       <div className="right-section">
         <FaSearch className="icon" />
         <FaRegQuestionCircle className="icon" />
         <FaCog className="icon" />
 
-        {/* View Selector Dropdown */}
         <div className="view-selector">
-          <select
-            value={currentCalendarView}
-            onChange={(e) => setCurrentCalendarView(e.target.value)}
+          <button
+            className="dropdown-toggle"
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            <option value="day">Day</option>
-            <option value="week">Week</option>
-            <option value="month">Month</option>
-          </select>
+            {options.find((o) => o.value === currentCalendarView)?.label ||
+              "View"}
+            <MdOutlineArrowDropDown />
+          </button>
+
+          {isDropdownOpen && (
+            <div className="custom-dropdown">
+              {options.map((opt) => (
+                <div
+                  key={opt.value}
+                  className={`dropdown-item ${
+                    currentCalendarView === opt.value ? "active" : ""
+                  }`}
+                  onClick={() => {
+                    setCurrentCalendarView(opt.value);
+                    setIsDropdownOpen(false);
+                  }}
+                >
+                  <span>{opt.label}</span>
+                  <span className="shortcut">{opt.shortcut}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="view-buttons">
-          <button className={currentCalendarView === "month" ? "active" : ""}>
+          <button
+            className={currentCalendarView === "month" ? "active" : ""}
+            onClick={() => setCurrentCalendarView("month")}
+          >
             <FaCalendarAlt />
           </button>
-          <button className={currentCalendarView === "week" ? "active" : ""}>
+          <button
+            className={currentCalendarView === "week" ? "active" : ""}
+            onClick={() => setCurrentCalendarView("week")}
+          >
             <FaCheck />
           </button>
-          <button className={currentCalendarView === "day" ? "active" : ""}>
+          <button
+            className={currentCalendarView === "day" ? "active" : ""}
+            onClick={() => setCurrentCalendarView("day")}
+          >
             <FaTh />
           </button>
         </div>
 
-        <div className="profile">H</div>
+        <div className="profile">{user.name[0].toUpperCase()}</div>
       </div>
     </header>
   );

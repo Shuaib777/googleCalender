@@ -54,9 +54,6 @@ const MonthView = () => {
     }
   }, [gridData]);
 
-  const handleDateClick = (date) => console.log("Date clicked:", date);
-  const handleEventClick = (event) => console.log("Event clicked:", event);
-
   return (
     <div className="month-view" ref={containerRef}>
       <div
@@ -79,8 +76,6 @@ const MonthView = () => {
               isCurrentMonth={dayData.isCurrentMonth}
               isToday={dayData.isCurrentDay}
               events={dayData.events}
-              onDateClick={handleDateClick}
-              onEventClick={handleEventClick}
             />
           ))
         )}

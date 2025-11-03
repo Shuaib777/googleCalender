@@ -1,42 +1,20 @@
-import React, { useState } from "react";
 import { FiPlus, FiUser, FiChevronDown, FiChevronUp } from "react-icons/fi";
-import { IoChevronDown } from "react-icons/io5";
-import { FaPlus } from "react-icons/fa6";
 import MiniCalendar from "../../calendar/MiniCalendar/MiniCalendar";
-import EventCard from "../../ui/Modal/EventCard"; // ✅ import your modal
 import "./Sidebar.scss";
+import CreateButton from "../CreateButton/CreateButton";
 
 const Sidebar = ({ sidebarOpen }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
-
-  const handleSaveEvent = (data) => {
-    console.log("New Event Saved:", data);
-    // 🔥 You can later post this data to backend using useApi() or context
-  };
-
   return (
     <>
       <aside className={`calendar-sidebar ${sidebarOpen ? "" : "hide"}`}>
-        {/* Create button */}
-        <button className="create-btn" onClick={handleOpenModal}>
-          <FaPlus size={20} />
-          <span>Create</span>
-          <IoChevronDown size={16} className="dropdown-icon" />
-        </button>
-
-        {/* Mini Calendar */}
+        <CreateButton />
         <MiniCalendar />
 
-        {/* Search People */}
         <div className="search-people">
           <FiUser size={20} />
           <span>Search for people</span>
         </div>
 
-        {/* Booking Pages */}
         <div className="sidebar-section">
           <div className="section-header">
             <span>Booking pages</span>
@@ -44,7 +22,6 @@ const Sidebar = ({ sidebarOpen }) => {
           </div>
         </div>
 
-        {/* My Calendars */}
         <div className="sidebar-section">
           <div className="section-header">
             <span>My calendars</span>
@@ -52,7 +29,6 @@ const Sidebar = ({ sidebarOpen }) => {
           </div>
         </div>
 
-        {/* Other Calendars */}
         <div className="sidebar-section">
           <div className="section-header">
             <span>Other calendars</span>
@@ -64,13 +40,6 @@ const Sidebar = ({ sidebarOpen }) => {
           </label>
         </div>
       </aside>
-
-      {/* ✅ Modal for creating event */}
-      <EventCard
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSave={handleSaveEvent}
-      />
     </>
   );
 };
