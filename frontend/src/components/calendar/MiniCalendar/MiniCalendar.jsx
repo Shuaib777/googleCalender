@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import "./MiniCalendar.scss";
 
 const MiniCalendar = () => {
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 10, 2)); // November 2, 2025
+  const [currentDate, setCurrentDate] = useState(new Date(2025, 10, 3)); // November 2, 2025
 
   const monthNames = [
     "January",

@@ -77,11 +77,9 @@ const EventCard = ({ isOpen, onClose, initialData }) => {
       let data;
 
       if (id) {
-        // ✏️ Edit existing event
         console.log("Updating event:", id, payload);
         data = await request(`/events/${id}`, "PUT", payload, false, true);
       } else {
-        // 🆕 Create new event
         console.log("Creating event:", payload);
         data = await request("/events", "POST", payload, false, true);
       }
@@ -104,7 +102,6 @@ const EventCard = ({ isOpen, onClose, initialData }) => {
   return (
     <div className="event-modal-overlay" onClick={onClose}>
       <div className="event-modal" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
         <div className="event-modal-header">
           <button className="menu-btn">
             <MdMenu size={24} />
@@ -114,7 +111,6 @@ const EventCard = ({ isOpen, onClose, initialData }) => {
           </button>
         </div>
 
-        {/* Title */}
         <div className="event-title-section">
           <input
             type="text"
@@ -126,16 +122,13 @@ const EventCard = ({ isOpen, onClose, initialData }) => {
           />
         </div>
 
-        {/* Tabs */}
         <div className="event-tabs">
           <button className="tab-btn active">Event</button>
           <button className="tab-btn">Task</button>
           <button className="tab-btn">Appointment schedule</button>
         </div>
 
-        {/* Details */}
         <div className="event-details">
-          {/* Time Row */}
           <div className="detail-row">
             <MdAccessTime size={24} className="detail-icon" />
             <div className="detail-content">
@@ -187,7 +180,6 @@ const EventCard = ({ isOpen, onClose, initialData }) => {
             <span className="detail-text">Add location</span>
           </div>
 
-          {/* Description */}
           <div className="detail-row">
             <MdDescription size={24} className="detail-icon" />
             <textarea
@@ -200,7 +192,6 @@ const EventCard = ({ isOpen, onClose, initialData }) => {
             />
           </div>
 
-          {/* Calendar Info */}
           <div className="detail-row">
             <MdCalendarToday size={24} className="detail-icon" />
             <div className="detail-content">
