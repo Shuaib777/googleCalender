@@ -1,6 +1,4 @@
-<img width="1918" height="931" alt="image" src="https://github.com/user-attachments/assets/cdc54c5e-f441-493a-80cf-c5d04193d85a" />## Google Calendar
-
-# hosted Link - google-calender-rho.vercel.app
+# hosted Link - https://google-calender-rho.vercel.app
 
 A high-fidelity, full-stack Google Calendar clone meticulously built using React.js, Node.js, Express, and MongoDB.
 This project delivers a pixel-perfect replication of Google Calendar’s core functionality and elegant design — featuring event creation, editing, deletion, and recurring event management with real-time updates and smooth UI interactions. It includes secure user authentication, light and dark modes, and a highly responsive interface that ensures a seamless and modern scheduling experience across all devices.
