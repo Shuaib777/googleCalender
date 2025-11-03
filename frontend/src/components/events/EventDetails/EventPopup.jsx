@@ -11,11 +11,11 @@ import {
 } from "react-icons/md";
 import EventCard from "../../ui/Modal/EventCard";
 import "./EventPopup.scss";
-import useApi from "../../../hooks/useApi";
+import { useEvent } from "../../../context/EventContext";
 
-const EventPopup = ({ event, onClose, onUpdate }) => {
+const EventPopup = ({ event, onClose }) => {
   const [showEventCard, setShowEventCard] = useState(false);
-  const request = useApi();
+  const { deleteEvent, updateEvent } = useEvent();
 
   const handleEditClick = () => {
     setShowEventCard(true);
@@ -27,13 +27,8 @@ const EventPopup = ({ event, onClose, onUpdate }) => {
 
     try {
       const id = event._id || event.id;
-      console.log("Deleting event:", id);
-
-      const data = await request(`/events/${id}`, "DELETE", null, false, true);
-      if (data) {
-        console.log("Event deleted successfully:", data);
-      }
-
+      await deleteEvent(id);
+      console.log("Event deleted successfully:", id);
       onClose();
     } catch (err) {
       console.error("Error deleting event:", err);
@@ -46,8 +41,8 @@ const EventPopup = ({ event, onClose, onUpdate }) => {
     onClose();
   };
 
-  const handleSave = (updatedData) => {
-    onUpdate(updatedData);
+  const handleSave = async (updatedData) => {
+    await updateEvent(updatedData);
     setShowEventCard(false);
     onClose();
   };
@@ -155,6 +150,7 @@ const EventPopup = ({ event, onClose, onUpdate }) => {
           isOpen={showEventCard}
           onClose={handleEventCardClose}
           initialData={formatEventData(event)}
+          onSave={handleSave}
         />
       )}
     </>

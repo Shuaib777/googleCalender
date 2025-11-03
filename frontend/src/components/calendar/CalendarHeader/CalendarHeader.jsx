@@ -8,9 +8,10 @@ import {
   FaCheck,
   FaTh,
 } from "react-icons/fa";
+import { MdOutlineArrowDropDown } from "react-icons/md";
 import "./CalendarHeader.scss";
 import { useAuth } from "../../../context/AuthContext";
-import { MdOutlineArrowDropDown } from "react-icons/md";
+import { useEvent } from "../../../context/EventContext";
 
 const CalendarHeader = ({
   onToggleSidebar,
@@ -18,8 +19,10 @@ const CalendarHeader = ({
   setCurrentCalendarView,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { user } = useAuth();
+  const { selectedDate, setSelectedDate } = useEvent();
 
-  const currentMonthYear = new Date().toLocaleString("default", {
+  const currentMonthYear = selectedDate.toLocaleString("default", {
     month: "long",
     year: "numeric",
   });
@@ -31,7 +34,29 @@ const CalendarHeader = ({
     { label: "Year", value: "year", shortcut: "Y" },
   ];
 
-  const { user } = useAuth();
+  const handleTodayClick = () => {
+    setSelectedDate(new Date());
+  };
+
+  const handleNavigation = (direction) => {
+    const newDate = new Date(selectedDate);
+
+    if (currentCalendarView === "day") {
+      newDate.setDate(selectedDate.getDate() + (direction === "next" ? 1 : -1));
+    } else if (currentCalendarView === "week") {
+      newDate.setDate(selectedDate.getDate() + (direction === "next" ? 7 : -7));
+    } else if (currentCalendarView === "month") {
+      newDate.setMonth(
+        selectedDate.getMonth() + (direction === "next" ? 1 : -1)
+      );
+    } else if (currentCalendarView === "year") {
+      newDate.setFullYear(
+        selectedDate.getFullYear() + (direction === "next" ? 1 : -1)
+      );
+    }
+
+    setSelectedDate(newDate);
+  };
 
   return (
     <header className="calendar-header">
@@ -44,11 +69,20 @@ const CalendarHeader = ({
           />
           <span className="title">Calendar</span>
         </div>
-        <button className="today-btn">Today</button>
+
+        <button className="today-btn" onClick={handleTodayClick}>
+          Today
+        </button>
+
         <div className="nav-arrows">
-          <span className="arrow">‹</span>
-          <span className="arrow">›</span>
+          <span className="arrow" onClick={() => handleNavigation("prev")}>
+            ‹
+          </span>
+          <span className="arrow" onClick={() => handleNavigation("next")}>
+            ›
+          </span>
         </div>
+
         <span className="date">{currentMonthYear}</span>
       </div>
 
@@ -109,7 +143,7 @@ const CalendarHeader = ({
           </button>
         </div>
 
-        <div className="profile">{user.name[0].toUpperCase()}</div>
+        <div className="profile">{user?.name?.[0]?.toUpperCase()}</div>
       </div>
     </header>
   );

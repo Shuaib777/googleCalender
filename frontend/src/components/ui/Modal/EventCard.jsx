@@ -11,14 +11,14 @@ import {
 import { SiGooglemeet } from "react-icons/si";
 import "./EventCard.scss";
 import { useAuth } from "../../../context/AuthContext";
-import useApi from "../../../hooks/useApi";
+import { useEvent } from "../../../context/EventContext";
 
 const EventCard = ({ isOpen, onClose, initialData }) => {
   const { user } = useAuth();
-  const request = useApi();
+  const { addEvent, updateEvent, selectedDate, setSelectedDate } = useEvent();
 
   const [formData, setFormData] = useState({
-    id: initialData?.id || null,
+    id: initialData?._id || null,
     title: initialData?.title || "",
     date: initialData?.date || "",
     startTime: initialData?.startTime || "",
@@ -32,16 +32,16 @@ const EventCard = ({ isOpen, onClose, initialData }) => {
   useEffect(() => {
     if (isOpen) {
       setFormData({
-        id: initialData?.id || null,
+        id: initialData?._id || null,
         title: initialData?.title || "",
-        date: initialData?.date || "",
+        date: initialData?.date || selectedDate.toISOString().split("T")[0],
         startTime: initialData?.startTime || "",
         endTime: initialData?.endTime || "",
         description: initialData?.description || "",
       });
       setError(null);
     }
-  }, [isOpen, initialData]);
+  }, [isOpen, initialData, selectedDate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,23 +74,18 @@ const EventCard = ({ isOpen, onClose, initialData }) => {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       };
 
-      let data;
-
       if (id) {
-        console.log("Updating event:", id, payload);
-        data = await request(`/events/${id}`, "PUT", payload, false, true);
+        await updateEvent({ _id: id, ...payload });
       } else {
-        console.log("Creating event:", payload);
-        data = await request("/events", "POST", payload, false, true);
+        await addEvent(payload);
       }
 
-      if (data) {
-        console.log("Event saved successfully:", data);
+      if (date) {
+        setSelectedDate(new Date(date));
       }
 
       onClose();
     } catch (err) {
-      console.error(err);
       setError(err.message || "Something went wrong");
     } finally {
       setIsSaving(false);
@@ -160,13 +155,11 @@ const EventCard = ({ isOpen, onClose, initialData }) => {
             </div>
           </div>
 
-          {/* Guests */}
           <div className="detail-row">
             <MdPeople size={24} className="detail-icon" />
             <span className="detail-text">Add guests</span>
           </div>
 
-          {/* Google Meet */}
           <div className="detail-row google-meet-row">
             <SiGooglemeet size={24} className="detail-icon google-meet-icon" />
             <span className="detail-text">
@@ -174,7 +167,6 @@ const EventCard = ({ isOpen, onClose, initialData }) => {
             </span>
           </div>
 
-          {/* Location */}
           <div className="detail-row">
             <MdLocationOn size={24} className="detail-icon" />
             <span className="detail-text">Add location</span>
@@ -208,7 +200,6 @@ const EventCard = ({ isOpen, onClose, initialData }) => {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="event-modal-footer">
           {error && <div className="event-modal-error">{error}</div>}
           <button className="more-options-btn">More options</button>

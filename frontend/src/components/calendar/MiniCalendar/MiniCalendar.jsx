@@ -1,12 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import "./MiniCalendar.scss";
+import { useEvent } from "../../../context/EventContext";
 
 const MiniCalendar = () => {
-  // Use current system date
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const today = new Date();
+  const { selectedDate, setSelectedDate } = useEvent();
 
+  // 🟢 local month/year state for viewing only
+  const [viewDate, setViewDate] = useState(selectedDate);
+
+  useEffect(() => {
+    // Whenever global date changes, sync view month to it
+    setViewDate(selectedDate);
+  }, [selectedDate]);
+
+  const today = new Date();
   const monthNames = [
     "January",
     "February",
@@ -23,34 +31,36 @@ const MiniCalendar = () => {
   ];
 
   const daysInMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() + 1,
+    viewDate.getFullYear(),
+    viewDate.getMonth() + 1,
     0
   ).getDate();
 
   const firstDayOfMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
+    viewDate.getFullYear(),
+    viewDate.getMonth(),
     1
   ).getDay();
 
+  // 🟢 Arrows only change local month
   const prevMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
-    );
+    setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1));
   };
 
   const nextMonth = () => {
-    setCurrentDate(
-      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
-    );
+    setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1));
+  };
+
+  // 🟢 Clicking a date updates global selectedDate
+  const handleDayClick = (day) => {
+    setSelectedDate(new Date(viewDate.getFullYear(), viewDate.getMonth(), day));
   };
 
   const renderCalendarDays = () => {
     const days = [];
     const prevMonthDays = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
+      viewDate.getFullYear(),
+      viewDate.getMonth(),
       0
     ).getDate();
 
@@ -67,18 +77,29 @@ const MiniCalendar = () => {
     for (let day = 1; day <= daysInMonth; day++) {
       const isToday =
         day === today.getDate() &&
-        currentDate.getMonth() === today.getMonth() &&
-        currentDate.getFullYear() === today.getFullYear();
+        viewDate.getMonth() === today.getMonth() &&
+        viewDate.getFullYear() === today.getFullYear();
+
+      const isSelected =
+        day === selectedDate.getDate() &&
+        viewDate.getMonth() === selectedDate.getMonth() &&
+        viewDate.getFullYear() === selectedDate.getFullYear();
 
       days.push(
-        <div key={day} className={`day-cell ${isToday ? "today" : ""}`}>
+        <div
+          key={day}
+          className={`day-cell ${isToday ? "today" : ""} ${
+            isSelected ? "selected" : ""
+          }`}
+          onClick={() => handleDayClick(day)}
+        >
           {day}
         </div>
       );
     }
 
-    // Next month days to fill the grid
-    const totalCells = 42; // 6 weeks x 7 days grid
+    // Next month filler cells
+    const totalCells = 42;
     const remainingCells = totalCells - days.length;
     for (let i = 1; i <= remainingCells; i++) {
       days.push(
@@ -95,7 +116,7 @@ const MiniCalendar = () => {
     <div className="mini-calendar">
       <div className="calendar-header">
         <span className="month-year">
-          {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+          {monthNames[viewDate.getMonth()]} {viewDate.getFullYear()}
         </span>
         <div className="nav-buttons">
           <button
@@ -116,13 +137,11 @@ const MiniCalendar = () => {
       </div>
 
       <div className="calendar-grid">
-        <div className="day-header">S</div>
-        <div className="day-header">M</div>
-        <div className="day-header">T</div>
-        <div className="day-header">W</div>
-        <div className="day-header">T</div>
-        <div className="day-header">F</div>
-        <div className="day-header">S</div>
+        {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
+          <div key={`header-${i}`} className="day-header">
+            {d}
+          </div>
+        ))}
         {renderCalendarDays()}
       </div>
     </div>

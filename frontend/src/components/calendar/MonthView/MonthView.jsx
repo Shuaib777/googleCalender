@@ -1,42 +1,79 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./MonthView.scss";
 import CalendarGrid from "../CalendarGrid/CalendarGrid";
-import useApi from "../../../hooks/useApi";
+import { useEvent } from "../../../context/EventContext";
 
 const MonthView = () => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const { events, selectedDate } = useEvent();
   const [gridData, setGridData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [rowHeights, setRowHeights] = useState([]);
   const containerRef = useRef(null);
-  const request = useApi();
 
-  const fetchMonthEvents = async (date) => {
-    setLoading(true);
-    try {
-      const formattedDate = date.toISOString().split("T")[0];
-      const response = await request(
-        `/events/month/${formattedDate}`,
-        "GET",
-        null,
-        false,
-        true
-      );
+  const buildMonthGrid = (date, eventsList) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
 
-      if (response && response.grid) {
-        setGridData(response.grid);
-      }
-    } catch (error) {
-      console.error("Error fetching month events:", error);
-    } finally {
-      setLoading(false);
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDay = firstDay.getDay();
+    const totalDays = lastDay.getDate();
+
+    const days = [];
+
+    for (let i = 0; i < startDay; i++) {
+      const d = new Date(year, month, i - startDay + 1);
+      days.push({
+        date: d,
+        isCurrentMonth: false,
+        isCurrentDay: false,
+        events: [],
+      });
     }
+    const formatISTDate = (date) => {
+      const ist = new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
+      return ist.toISOString().split("T")[0];
+    };
+
+    for (let i = 1; i <= totalDays; i++) {
+      const d = new Date(year, month, i);
+      const isoDate = d.toISOString().split("T")[0];
+      const dayEvents = eventsList.filter((ev) => {
+        const eventDate = formatISTDate(new Date(ev.startTime));
+        return eventDate === formatISTDate(d);
+      });
+
+      days.push({
+        date: d,
+        isCurrentMonth: true,
+        isCurrentDay: d.toDateString() === new Date().toDateString(),
+        events: dayEvents,
+      });
+    }
+
+    // Fill next month days to complete the grid (42 cells typical)
+    const totalCells = 42;
+    const nextDays = totalCells - days.length;
+    for (let i = 1; i <= nextDays; i++) {
+      const d = new Date(year, month + 1, i);
+      days.push({
+        date: d,
+        isCurrentMonth: false,
+        isCurrentDay: false,
+        events: [],
+      });
+    }
+
+    return days;
   };
 
+  // whenever events or selectedDate change, rebuild grid
   useEffect(() => {
-    fetchMonthEvents(currentDate);
-  }, [currentDate]);
+    if (selectedDate) {
+      setGridData(buildMonthGrid(selectedDate, events));
+    }
+  }, [events, selectedDate]);
 
+  // Dynamic row heights
   useEffect(() => {
     if (containerRef.current && gridData.length > 0) {
       const containerHeight = containerRef.current.clientHeight;
@@ -62,23 +99,16 @@ const MonthView = () => {
           gridTemplateRows: rowHeights.map((h) => `${h}px`).join(" "),
         }}
       >
-        {loading ? (
-          <div className="loading-overlay">
-            <div className="spinner"></div>
-            <p>Loading events...</p>
-          </div>
-        ) : (
-          gridData.map((dayData, index) => (
-            <CalendarGrid
-              key={index}
-              index={index}
-              date={new Date(dayData.date)}
-              isCurrentMonth={dayData.isCurrentMonth}
-              isToday={dayData.isCurrentDay}
-              events={dayData.events}
-            />
-          ))
-        )}
+        {gridData.map((dayData, index) => (
+          <CalendarGrid
+            key={index}
+            index={index}
+            date={new Date(dayData.date)}
+            isCurrentMonth={dayData.isCurrentMonth}
+            isToday={dayData.isCurrentDay}
+            events={dayData.events}
+          />
+        ))}
       </div>
     </div>
   );

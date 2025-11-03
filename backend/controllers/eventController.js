@@ -12,15 +12,19 @@ export const createEvent = async (req, res) => {
 
     const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
 
-    const start = startTime ? new Date(startTime) : nowIST;
-    const end = endTime ? new Date(endTime) : nowIST;
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+
+    const toIST = (date) => new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
+    const startIST = toIST(start);
+    const endIST = toIST(end);
 
     const event = await Event.create({
       user: req.user._id,
       title,
       description,
-      startTime: start,
-      endTime: end,
+      startTime: startIST,
+      endTime: endIST,
       recurrenceType: recurrenceType || "none",
       timezone: timezone || "Asia/Kolkata",
     });
