@@ -1,17 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   FaBars,
   FaSearch,
   FaRegQuestionCircle,
-  FaCog,
   FaCalendarAlt,
   FaCheck,
   FaTh,
+  FaSun,
+  FaMoon,
 } from "react-icons/fa";
 import { MdOutlineArrowDropDown } from "react-icons/md";
 import "./CalendarHeader.scss";
 import { useAuth } from "../../../context/AuthContext";
 import { useEvent } from "../../../context/EventContext";
+import useApi from "../../../hooks/useApi";
+import { useNavigate } from "react-router-dom";
+import { BiSolidGrid } from "react-icons/bi";
+import { MdApps } from "react-icons/md";
 
 const CalendarHeader = ({
   onToggleSidebar,
@@ -19,8 +24,16 @@ const CalendarHeader = ({
   setCurrentCalendarView,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { user } = useAuth();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [theme, setTheme] = useState(
+    document.documentElement.getAttribute("data-theme") || "light"
+  );
+
+  const { user, logout } = useAuth();
   const { selectedDate, setSelectedDate } = useEvent();
+  const request = useApi();
+  const profileRef = useRef(null);
+  const navigate = useNavigate();
 
   const currentMonthYear = selectedDate.toLocaleString("default", {
     month: "long",
@@ -34,9 +47,19 @@ const CalendarHeader = ({
     { label: "Year", value: "year", shortcut: "Y" },
   ];
 
-  const handleTodayClick = () => {
-    setSelectedDate(new Date());
-  };
+  // Handle clicks outside profile dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Handle Today navigation
+  const handleTodayClick = () => setSelectedDate(new Date());
 
   const handleNavigation = (direction) => {
     const newDate = new Date(selectedDate);
@@ -58,6 +81,33 @@ const CalendarHeader = ({
     setSelectedDate(newDate);
   };
 
+  const handleLogout = async () => {
+    try {
+      await request("/user/logout", "POST", null, true, true);
+      logout();
+      navigate("/auth");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  // 🔆 Theme Toggle Logic
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", newTheme);
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme); // optional persistence
+  };
+
+  // Load theme from localStorage (optional)
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      setTheme(savedTheme);
+    }
+  }, []);
+
   return (
     <header className="calendar-header">
       <div className="left-section">
@@ -65,7 +115,7 @@ const CalendarHeader = ({
         <div className="logo">
           <img
             src="https://www.gstatic.com/images/branding/product/1x/calendar_2020q4_48dp.png"
-            alt="Google Calendar"
+            alt="Calendar Logo"
           />
           <span className="title">Calendar</span>
         </div>
@@ -89,8 +139,13 @@ const CalendarHeader = ({
       <div className="right-section">
         <FaSearch className="icon" />
         <FaRegQuestionCircle className="icon" />
-        <FaCog className="icon" />
 
+        {/* 🌗 Theme Toggle */}
+        <button onClick={toggleTheme} className="theme-toggle icon">
+          {theme === "dark" ? <FaSun /> : <FaMoon />}
+        </button>
+
+        {/* View Dropdown */}
         <div className="view-selector">
           <button
             className="dropdown-toggle"
@@ -122,28 +177,41 @@ const CalendarHeader = ({
           )}
         </div>
 
+        {/* View Buttons */}
         <div className="view-buttons">
-          <button
-            className={currentCalendarView === "month" ? "active" : ""}
-            onClick={() => setCurrentCalendarView("month")}
-          >
+          <button className={currentCalendarView === "month" ? "active" : ""}>
             <FaCalendarAlt />
           </button>
-          <button
-            className={currentCalendarView === "week" ? "active" : ""}
-            onClick={() => setCurrentCalendarView("week")}
-          >
+          <button className={currentCalendarView === "week" ? "active" : ""}>
             <FaCheck />
-          </button>
-          <button
-            className={currentCalendarView === "day" ? "active" : ""}
-            onClick={() => setCurrentCalendarView("day")}
-          >
-            <FaTh />
           </button>
         </div>
 
-        <div className="profile">{user?.name?.[0]?.toUpperCase()}</div>
+        <button className="grid">
+          <MdApps size={22} className="apps-icon" />
+        </button>
+
+        {/* Profile Dropdown */}
+        <div className="profile-wrapper" ref={profileRef}>
+          <div
+            className="profile"
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+          >
+            {user?.name?.[0]?.toUpperCase()}
+          </div>
+
+          {isProfileOpen && (
+            <div className="profile-dropdown">
+              <div className="profile-info">
+                <strong>{user?.name}</strong>
+                <p>{user?.email}</p>
+              </div>
+              <button className="logout-btn" onClick={handleLogout}>
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
