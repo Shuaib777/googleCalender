@@ -3,7 +3,9 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import "./MiniCalendar.scss";
 
 const MiniCalendar = () => {
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 10, 3)); // November 2, 2025
+  // Use current system date
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const today = new Date();
 
   const monthNames = [
     "January",
@@ -64,9 +66,10 @@ const MiniCalendar = () => {
     // Current month days
     for (let day = 1; day <= daysInMonth; day++) {
       const isToday =
-        day === 2 &&
-        currentDate.getMonth() === 10 &&
-        currentDate.getFullYear() === 2025;
+        day === today.getDate() &&
+        currentDate.getMonth() === today.getMonth() &&
+        currentDate.getFullYear() === today.getFullYear();
+
       days.push(
         <div key={day} className={`day-cell ${isToday ? "today" : ""}`}>
           {day}
@@ -75,7 +78,8 @@ const MiniCalendar = () => {
     }
 
     // Next month days to fill the grid
-    const remainingCells = 35 - days.length;
+    const totalCells = 42; // 6 weeks x 7 days grid
+    const remainingCells = totalCells - days.length;
     for (let i = 1; i <= remainingCells; i++) {
       days.push(
         <div key={`next-${i}`} className="day-cell next-month">
