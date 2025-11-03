@@ -1,4 +1,5 @@
-# hosted Link - https://google-calender-rho.vercel.app
+# Google Calendar Clone
+Hosted Link: https://google-calender-rho.vercel.app
 
 A high-fidelity, full-stack Google Calendar clone meticulously built using React.js, Node.js, Express, and MongoDB.
 This project delivers a pixel-perfect replication of Google Calendar’s core functionality and elegant design — featuring event creation, editing, deletion, and recurring event management with real-time updates and smooth UI interactions. It includes secure user authentication, light and dark modes, and a highly responsive interface that ensures a seamless and modern scheduling experience across all devices.
@@ -86,7 +87,7 @@ google-calendar-clone/
 
 --> (For Frontend):
 
-cd client
+cd frontend
 
 npm install
 
@@ -99,7 +100,6 @@ npm install
 3. Create a .env file inside /backend with:
 
 MONGO_URI=your_mongodb_connection_string
-
 JWT_SECRET=your_secret_key  
 PORT=5000
 
@@ -112,7 +112,7 @@ npm start
 
 --> Start frontend:
 
-cd ../client
+cd ../frontend
 
 npm run dev
 
